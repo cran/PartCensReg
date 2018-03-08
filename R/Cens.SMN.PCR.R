@@ -1,5 +1,4 @@
-Cens.SMN.PCR <-
-function(x, y, c, cens="left", tt, nu=NULL, error=10^-6, iter.max=200, type = "Normal", lambda.FIX = TRUE, nu.FIX = TRUE, lambda.in = 10^-3, k = 1, Diagnostic = TRUE, a = 2)
+Cens.SMN.PCR = function(x, y, c, cens="left", tt, nu=NULL, error=10^-6, iter.max=200, type = "Normal", alpha.FIX = TRUE, nu.FIX = TRUE, alpha.in = 10^-3, k = 1, Diagnostic = TRUE, a = 2)
 {
   #== Required packages
 
@@ -74,7 +73,7 @@ function(x, y, c, cens="left", tt, nu=NULL, error=10^-6, iter.max=200, type = "N
 
   #== Validation, smoothing parameter lambda > 0
 
-  if(lambda.in <= 0) stop("lambda parameter must be positive.")
+  if(alpha.in <= 0) stop("alpha parameter must be positive.")
 
   #== Validation, additional parameters
 
@@ -86,14 +85,15 @@ function(x, y, c, cens="left", tt, nu=NULL, error=10^-6, iter.max=200, type = "N
   if(iter.max <= 0 | iter.max%%1 != 0) stop("iter.max must be a positive integer.")
   if(error <=0 | error > 1) stop("error must belong to the interval (0,1]")
 
-  if(!is.logical(lambda.FIX) | !is.logical(nu.FIX) | !is.logical(Diagnostic)) stop("Parameters lambda.FIX, nu.FIX and Diagnostic must be logical (TRUE/FALSE) variables.")
+  if(!is.logical(alpha.FIX) | !is.logical(nu.FIX) | !is.logical(Diagnostic)) stop("Parameters lambda.FIX, nu.FIX and Diagnostic must be logical (TRUE/FALSE) variables.")
+
 
   #---------------------------------------------------------------------#
   #                              EM outputs                             #
   #---------------------------------------------------------------------#
 
 
-  out.EM = EMSpline.censFinal_MobsSMN(x, y, c, cens, tt, nu, error, iter.max, type, delta.in=NA, lambda.FIX, nu.FIX, lambda.in, k)
+  out.EM = EMSpline.censFinal_MobsSMN(x, y, c, cens, tt, nu, error, iter.max, type, delta.in=NA, alpha.FIX, nu.FIX, alpha.in, k)
 
   betas    = round(out.EM$beta, 4)
   sigma2   = round(out.EM$sigma2, 4)
@@ -126,27 +126,27 @@ function(x, y, c, cens="left", tt, nu=NULL, error=10^-6, iter.max=200, type = "N
 
  if( type=="Normal")
   {
-    alpha            = t(as.matrix(out.EM$lambda))
+    alpha            = t(as.matrix(out.EM$Alpha))
     row.names(alpha) = paste0(greeks['alpha'])
     colnames(alpha)  = " "
   }
 
   if( (type=="T") || (type=="Slash"))
   {
-    alpha1            = matrix(out.EM$lambda,ncol=1,nrow=1)
+    alpha1            = matrix(out.EM$Alpha,ncol=1,nrow=1)
     dimnames(alpha1)  = list(c(paste0(greeks['alpha'])),"")
   }
 
  if( type=="NormalC")
   {
-    alpha2            = matrix(out.EM$lambda,ncol=1,nrow=1)
+    alpha2            = matrix(out.EM$Alpha,ncol=1,nrow=1)
     dimnames(alpha2)  = list(c(paste0(greeks['alpha'])),"")
   }
 
   cat('\n')
-  cat('--------------------------------------------------------------\n')
-  cat('     Partially censored regression models with SMN errors     \n')
-  cat('--------------------------------------------------------------\n')
+  cat('---------------------------------------------------------------------\n')
+  cat('     Partially linear censored regression models with SMN errors     \n')
+  cat('---------------------------------------------------------------------\n')
   print(Estimates)
 
  if(type!="Normal")
@@ -198,3 +198,4 @@ function(x, y, c, cens="left", tt, nu=NULL, error=10^-6, iter.max=200, type = "N
 
 out.EM
 }
+

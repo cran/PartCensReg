@@ -37,7 +37,7 @@ funcKi <- function(yi, mui, sigma2, nu, type){
 }
 
 funcJi <- function(yi, mui, sigma2, nu, type){
-  aux <- (yi-mui)/sqrt(sigma2)
+  aux  <- (yi-mui)/sqrt(sigma2)
   if(type=="Normal") {Ji <- pnorm(aux)}
   if(type=="T")      {Ji <- pt(aux,df=nu)}
   if(type=="Slash")  {Ji <- AcumSlash(aux,0,1,nu)}
@@ -94,7 +94,7 @@ MIobsSMN <- function(x, y, c, cens, tt, nu, beta, ff, sigma2, lambda, type){
         di_gamasig  <- (2/sigma2^2)*(t(Deltai)%*%(yi-mui))
 
         dK_gama     <- (-0.5)*Iphi_3.2*di_gama
-        dK_sig      <-  (-0.5)*Iphi_3.2*di_sig
+        dK_sig      <- (-0.5)*Iphi_3.2*di_sig
         dK_gamagama <- (-0.5)*Iphi_3.2*di_gamagama + 0.25*Iphi_5.2*di_gama%*%t(di_gama)
         dK_sigsig   <- (-0.5)*Iphi_3.2*di_sigsig + 0.25*Iphi_5.2*di_sig*di_sig
         dK_gamasig  <- (-0.5)*Iphi_3.2*di_gamasig + 0.25*Iphi_5.2*di_sig*di_gama
@@ -121,7 +121,7 @@ MIobsSMN <- function(x, y, c, cens, tt, nu, beta, ff, sigma2, lambda, type){
         Ai_gamasig  <- (0.5/sigma2^(3/2))*t(Deltai)
 
         dJ_gama     <- IAcphi_1.2*Ai_gama
-        dJ_sig      <-  IAcphi_1.2*Ai_sig
+        dJ_sig      <- IAcphi_1.2*Ai_sig
         dJ_gamagama <- (-0.5)*IAcphi_3.2*di_gama%*%t(Ai_gama) + IAcphi_1.2*Ai_gamagama
         dJ_sigsig   <- (-0.5)*IAcphi_3.2*di_sig*Ai_sig + IAcphi_1.2*Ai_sigsig
         dJ_gamasig  <- (-0.5)*IAcphi_3.2*di_sig*Ai_gama + IAcphi_1.2*Ai_gamasig
@@ -181,7 +181,7 @@ MIobsSMN <- function(x, y, c, cens, tt, nu, beta, ff, sigma2, lambda, type){
         di_gamasig  <- (2/sigma2^2)*(t(Deltai)%*%(yi-mui))
 
         dK_gama     <- (-0.5)*Iphi_3.2*di_gama
-        dK_sig      <-  (-0.5)*Iphi_3.2*di_sig
+        dK_sig      <- (-0.5)*Iphi_3.2*di_sig
         dK_gamagama <- (-0.5)*Iphi_3.2*di_gamagama + 0.25*Iphi_5.2*di_gama%*%t(di_gama)
         dK_sigsig   <- (-0.5)*Iphi_3.2*di_sigsig + 0.25*Iphi_5.2*di_sig*di_sig
         dK_gamasig  <- (-0.5)*Iphi_3.2*di_gamasig + 0.25*Iphi_5.2*di_sig*di_gama
@@ -208,7 +208,7 @@ MIobsSMN <- function(x, y, c, cens, tt, nu, beta, ff, sigma2, lambda, type){
         Ai_gamasig  <- (0.5/sigma2^(3/2))*t(Deltai)
 
         dJ_gama     <- IAcphi_1.2*Ai_gama
-        dJ_sig      <-  IAcphi_1.2*Ai_sig
+        dJ_sig      <- IAcphi_1.2*Ai_sig
         dJ_gamagama <- (-0.5)*IAcphi_3.2*di_gama%*%t(Ai_gama) + IAcphi_1.2*Ai_gamagama
         dJ_sigsig   <- (-0.5)*IAcphi_3.2*di_sig*Ai_sig + IAcphi_1.2*Ai_sigsig
         dJ_gamasig  <- (-0.5)*IAcphi_3.2*di_sig*Ai_gama + IAcphi_1.2*Ai_gamasig
@@ -241,7 +241,7 @@ MIobsSMN <- function(x, y, c, cens, tt, nu, beta, ff, sigma2, lambda, type){
 
 }
 
-EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, type, delta.in=NA, lambda.FIX, nu.FIX, lambda.in, k=0){
+EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, type, delta.in=NA, alpha.FIX, nu.FIX, alpha.in, k=0){
 
   if(nu.FIX==FALSE){
 
@@ -257,7 +257,7 @@ EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, t
   for(i in 1:r){N[tt==tr[i],i] = 1}
   qq  <- ncol(N)
 
-  lambda <- lambda.in
+  lambda <- alpha.in
 
   #=== Initial values
 
@@ -344,7 +344,7 @@ EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, t
       ver_novo <- -f(nu)}
 
     ft <- function(lambda) AICsmn(lambda,ver_novo,ff,K,N,sigma2,p,type)
-    if(lambda.FIX==FALSE){lambda<- optimize(f=ft, interval=c(0,100),maximum=TRUE,tol=10^{-6})$maximum}
+    if(alpha.FIX==FALSE){lambda<- optimize(f=ft, interval=c(0,100),maximum=TRUE,tol=10^{-6})$maximum}
 
     theta     <- c(beta,sigma2,nu,lambda)
     criterio  <- (abs(1-ver_novo/ver_velho))
@@ -359,7 +359,7 @@ EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, t
   MI  <- MIf$MI
   Diagnostics <- dignostic.EM_Sem(x, y, tt,  beta, ff, sigma2, lambda,  u0, u1, u2, k, type)
   close(pb)
-  return(list(beta=beta,sigma2=sigma2,lambda=lambda, AIC= AIC, ff=ff, yest= mu, loglik = ver_novo, iter=count, nu=nu, theta=theta, MI=MI, u0=u0, u1=u1, u2=u2, D=Diagnostics))
+  return(list(beta=beta,sigma2=sigma2,Alpha=lambda, AIC= AIC, ff=ff, yest= mu, loglik = ver_novo, iter=count, nu=nu, theta=theta, MI=MI, u0=u0, u1=u1, u2=u2, D=Diagnostics))
 
   }
 
@@ -378,7 +378,7 @@ EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, t
     for(i in 1:r){N[tt==tr[i],i] = 1}
     qq  <- ncol(N)
 
-    lambda <- lambda.in
+    lambda <- alpha.in
 
     #=== Initial values
 
@@ -463,7 +463,7 @@ EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, t
         ver_novo <- f(nu)}
 
       ft <- function(lambda) AICsmn(lambda,ver_novo,ff,K,N,sigma2,p,type)
-      if(lambda.FIX==FALSE){lambda<- optimize(f=ft, interval=c(0,100),maximum=TRUE,tol=10^{-6})$maximum}
+      if(alpha.FIX==FALSE){lambda<- optimize(f=ft, interval=c(0,100),maximum=TRUE,tol=10^{-6})$maximum}
 
       theta     <- c(beta,sigma2,nu,lambda)
       criterio  <- (abs(1-ver_novo/ver_velho))
@@ -478,7 +478,7 @@ EMSpline.censFinal_MobsSMN <- function(x, y, c, cens, tt, nu, error, iter.max, t
     MI  <- MIf$MI
     Diagnostics <- dignostic.EM_Sem(x, y, tt,  beta, ff, sigma2, lambda,  u0, u1, u2, k, type)
     close(pb)
-    return(list(beta=beta,sigma2=sigma2,lambda=lambda, AIC= AIC, ff=ff, yest= mu, loglik = ver_novo, iter=count, nu=nu, MI=MI,D=Diagnostics))
+    return(list(beta=beta,sigma2=sigma2,Alpha=lambda, AIC= AIC, ff=ff, yest= mu, loglik = ver_novo, iter=count, nu=nu, MI=MI,D=Diagnostics))
 
   }
 
